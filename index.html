@@ -344,12 +344,12 @@ cv.addEventListener('contextmenu', e => e.preventDefault());
 
 /* ---------------- 모바일: 터치 입력 (멀티터치) ---------------- */
 const TOUCH = { move:0, joyId:null, joyDX:0, pressed:{} };
-const JOY  = { x:150, y:H-118, r:64, knob:30, grab:115 }; // 왼쪽 가상 조이스틱
-const BTNS = [  // 오른쪽 버튼 배치
-  { id:'jump', label:'점프', x:W-95,  y:H-105, r:54 },
-  { id:'shot', label:'',     x:W-215, y:H-168, r:44 }, // 흡입/발사 통합
-  { id:'dash', label:'대쉬', x:W-228, y:H-58,  r:37 },
-  { id:'bomb', label:'폭탄', x:W-340, y:H-108, r:36 },
+const JOY  = { x:120, y:H-95, r:48, knob:22, grab:105 }; // 왼쪽 가상 조이스틱 (시각 크기 축소)
+const BTNS = [  // 오른쪽 버튼 배치 (축소판)
+  { id:'jump', label:'점프', x:W-80,  y:H-85,  r:40 },
+  { id:'shot', label:'',     x:W-175, y:H-135, r:34 }, // 흡입/발사 통합
+  { id:'dash', label:'대쉬', x:W-185, y:H-48,  r:28 },
+  { id:'bomb', label:'폭탄', x:W-275, y:H-88,  r:28 },
 ];
 function canvasPos(t){
   const r = cv.getBoundingClientRect();
@@ -374,7 +374,7 @@ cv.addEventListener('touchstart', e => {
       continue;
     }
     for (const b of BTNS){
-      if (Math.hypot(c.x-b.x, c.y-b.y) < b.r + 14){
+      if (Math.hypot(c.x-b.x, c.y-b.y) < b.r + 24){
         TOUCH.pressed[t.identifier] = b.id;
         pressBtn(b.id);
         break;
@@ -1202,13 +1202,13 @@ function pxCircle(cx2, cy2, r, fill, border){
 }
 function drawTouchControls(){
   const p = G.player;
-  ctx.save(); ctx.globalAlpha = .62;
+  ctx.save(); ctx.globalAlpha = .3; // 게임 화면이 비치도록 반투명
   // 왼쪽: 가상 조이스틱
   pxCircle(JOY.x, JOY.y, JOY.r, 'rgba(24,32,90,.55)', 'rgba(242,234,216,.85)');
-  ctx.fillStyle='rgba(242,234,216,.5)';
-  ctx.font='20px '+FONT; ctx.textAlign='center';
-  ctx.fillText('◀', JOY.x-42, JOY.y+8); ctx.fillText('▶', JOY.x+42, JOY.y+8);
-  pxCircle(JOY.x + TOUCH.joyDX*.8, JOY.y, JOY.knob,
+  ctx.fillStyle='rgba(242,234,216,.6)';
+  ctx.font='14px '+FONT; ctx.textAlign='center';
+  ctx.fillText('◀', JOY.x-31, JOY.y+5); ctx.fillText('▶', JOY.x+31, JOY.y+5);
+  pxCircle(JOY.x + TOUCH.joyDX*.6, JOY.y, JOY.knob,
            TOUCH.joyId!==null ? '#5fe0c8' : 'rgba(242,234,216,.9)', '#241633');
   // 오른쪽: 버튼
   for (const b of BTNS){
@@ -1220,15 +1220,16 @@ function drawTouchControls(){
     }
     if (b.id==='dash' && p.dashCd>0) fill='rgba(40,40,60,.5)';
     if (b.id==='bomb'){ sub='x'+G.bombs; if (G.bombs<=0) fill='rgba(40,40,60,.5)'; }
-    if (held) fill='rgba(95,224,200,.85)';
+    if (held) { fill='rgba(95,224,200,.85)'; ctx.globalAlpha=.55; } // 누르는 동안만 살짝 진하게
     pxCircle(b.x, b.y, b.r, fill, 'rgba(242,234,216,.85)');
-    pxText(label, b.x, b.y+6, b.id==='jump'?20:16, '#fff', 'center');
-    if (sub) pxText(sub, b.x, b.y+26, 13, '#ffd84d', 'center');
+    pxText(label, b.x, b.y+5, b.id==='jump'?15:13, '#fff', 'center');
+    if (sub) pxText(sub, b.x, b.y+19, 11, '#ffd84d', 'center');
     if (b.id==='shot' && p.loaded){ // 장전된 슬라임 미리보기
-      ctx.fillStyle='#241633'; ctx.fillRect(b.x-11, b.y-32, 22, 15);
-      ctx.fillStyle=p.loaded;   ctx.fillRect(b.x-9,  b.y-30, 18, 11);
-      ctx.fillStyle='#241633';  ctx.fillRect(b.x-5, b.y-26, 3, 3); ctx.fillRect(b.x+2, b.y-26, 3, 3);
+      ctx.fillStyle='#241633'; ctx.fillRect(b.x-8, b.y-25, 16, 12);
+      ctx.fillStyle=p.loaded;   ctx.fillRect(b.x-6, b.y-23, 12, 8);
+      ctx.fillStyle='#241633';  ctx.fillRect(b.x-4, b.y-21, 2, 2); ctx.fillRect(b.x+2, b.y-21, 2, 2);
     }
+    ctx.globalAlpha=.3;
   }
   ctx.restore();
 }
